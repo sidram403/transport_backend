@@ -33,13 +33,14 @@ export const getTripDetails = async (req, res, next) => {
       })
     );
 
+
     return res.status(200).json(tripData);
   } catch (error) {
     next(error);
   }
 };
 
-export const getEmployeeDetails = async (req, res, next) => {
+export const getEmployeeDetailsById = async (req, res, next) => {
   try {
     const {tripId} = req.body
     const employeeDetails = await Employee.find( {},{});
@@ -68,6 +69,32 @@ export const getEmployeeDetails = async (req, res, next) => {
   }
 };
 
+export const getAllEmployeeDetails = async (req, res, next) => {
+  try {
+    const employeeDetails = await Employee.find( {},{});
+    
+    const mergedEmployeeData = employeeDetails.reduce((acc, employee) => {
+      const transformedEmployeeData = employee.employeeData.map(data => ({
+        area: data.Area,
+        employeeAddress: data["Employee Address"],
+        employeeEmergencyContact: data["Employee Emergency contact"],
+        employeeId: data["Employee Id"],
+        employeeName: data["Employee Name"],
+        employeePhone: data["Employee Phone"],
+        shiftTime: data["Shift time"],
+        shiftType: data["Shift type"],
+        tripId: data.tripId
+      }));
+
+      return [...acc, ...transformedEmployeeData];
+    }, []);
+
+    return res.status(200).json(mergedEmployeeData);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const checkTripId = async (req, res, next) => {
   try {
     const { tripId } = req.body;
@@ -82,6 +109,10 @@ export const checkTripId = async (req, res, next) => {
     next(error)
   }
 };
+
+
+
+
 
 
 
