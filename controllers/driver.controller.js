@@ -63,3 +63,33 @@ export const getAllVehicleDetails = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getDetailsByVehicleNumber = async (req, res, next) => {
+  let { vehicleNumbers } = req.body;
+
+  // Ensure vehicleNumbers is an array
+  if (!Array.isArray(vehicleNumbers)) {
+    vehicleNumbers = [vehicleNumbers];
+  }
+
+  // Initialize an array to hold promises for finding each driver
+  const driverPromises = vehicleNumbers.map(vehicleNumber =>
+    Driver.findOne({ vehicleNumber }).exec()
+  );
+
+  try {
+    // Resolve all promises
+    const drivers = await Promise.all(driverPromises);
+
+    // Filter out null values (in case no driver was found for some vehicle numbers)
+    const driverDetailsArray = drivers.filter(driver => driver !== null).map(driver => driver._doc);
+
+    if (driverDetailsArray.length === 0) {
+      return res.status(404).json({ msg: 'No driver details found for the provided vehicle numbers' });
+    }
+
+    return res.status(200).json(driverDetailsArray);
+  } catch (error) {
+    next(error);
+  }
+};

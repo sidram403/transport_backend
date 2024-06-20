@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 import tripsRouter from './routes/trips.route.js'
 import driverRouter from './routes/driver.route.js'
+import authRouter from './routes/auth.route.js'
 
 dotenv.config()
 
@@ -22,6 +23,7 @@ app.use(express.json());
 
 app.use('/server/trips', tripsRouter)
 app.use('/server/driver', driverRouter)
+app.use('/server/auth', authRouter)
 app.listen(3000, () =>{
     console.log('Server is running on port 3000!');
 })
