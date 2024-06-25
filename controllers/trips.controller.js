@@ -1,3 +1,4 @@
+import ActiveTrip from "../models/activetrip.model.js";
 import Employee from "../models/exployee.model.js";
 import Trips from "../models/trips.model.js";
 
@@ -26,6 +27,52 @@ export const uploadTripDetails = async (req, res, next) => {
     await tripsDetails.save();
     await employeeDetails.save();
     res.status(200).send("Trip Details submitted successfully");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const saveActiveTrips = async (req, res, next) => {
+  try {
+    const tripsData = req.body; // Assuming the body is an array of trip details
+
+    if (!Array.isArray(tripsData)) {
+      return res.status(400).send("Request body should be an array of trip details");
+    }
+
+    const savePromises = tripsData.map(async tripData => {
+      const {
+        area,
+        employeeAddress,
+        employeeName,
+        employeePhone,
+        gender,
+        loginTime,
+        selectedVehicle,
+        tripId,
+        totalKM,
+      } = tripData;
+
+      const newActiveTrip = new ActiveTrip({
+        loginTime,
+        tripId,
+        vehicleNumber,
+        driverName,
+        driverMobile,
+        escort,
+        employeeName,
+        employeePhone,
+        gender,
+        pickAddress,
+        area,
+        totalKM,
+      });
+
+      return newActiveTrip.save();
+    });
+
+    await Promise.all(savePromises);
+    res.status(200).send("All Active Trip details submitted successfully");
   } catch (error) {
     next(error);
   }

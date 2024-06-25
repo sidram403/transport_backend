@@ -5,6 +5,7 @@ import cors from 'cors'
 import tripsRouter from './routes/trips.route.js'
 import driverRouter from './routes/driver.route.js'
 import authRouter from './routes/auth.route.js'
+import cookieParser from 'cookie-parser';
 
 dotenv.config()
 
@@ -19,6 +20,8 @@ const app= express()
 app.use(cors())
 
 app.use(express.json());
+
+app.use(cookieParser());
 
 
 app.use('/server/trips', tripsRouter)
