@@ -32,6 +32,7 @@ export const uploadTripDetails = async (req, res, next) => {
   }
 };
 
+
 export const saveActiveTrips = async (req, res, next) => {
   try {
     const tripsData = req.body; // Assuming the body is an array of trip details
@@ -42,41 +43,47 @@ export const saveActiveTrips = async (req, res, next) => {
 
     const savePromises = tripsData.map(async tripData => {
       const {
-        area,
-        employeeAddress,
-        employeeName,
-        employeePhone,
-        gender,
         loginTime,
+        tripId,
         selectedVehicle,
-        tripId,
-        totalKM,
-      } = tripData;
-
-      const newActiveTrip = new ActiveTrip({
-        loginTime,
-        tripId,
-        vehicleNumber,
         driverName,
         driverMobile,
         escort,
         employeeName,
         employeePhone,
         gender,
-        pickAddress,
+        employeeAddress, // Use employeeAddress as it is from req.body
+        area,
+        totalKM,
+      } = tripData;
+
+      // Create a new ActiveTrip instance using Mongoose model
+      const newActiveTrip = new ActiveTrip({
+        loginTime,
+        tripId,
+        vehicleNumber: selectedVehicle.vehicleNumber,
+        driverName,
+        driverMobile,
+        escort,
+        employeeName,
+        employeePhone,
+        gender,
+        pickAddress: employeeAddress, // Rename employeeAddress to pickAddress
         area,
         totalKM,
       });
 
-      return newActiveTrip.save();
+      // Save the ActiveTrip instance to MongoDB
+      await newActiveTrip.save();
     });
 
-    await Promise.all(savePromises);
+    await Promise.all(savePromises); // Wait for all saves to complete
     res.status(200).send("All Active Trip details submitted successfully");
   } catch (error) {
-    next(error);
+    next(error); // Pass any caught errors to the error handler middleware
   }
 };
+
 
 export const getTripDetails = async (req, res, next) => {
   try {
@@ -214,5 +221,22 @@ export const deleteEmployeeFromTrip = async (req, res, next) => {
     return res.status(200).json("Trip Deleted successfully");
   } catch (error) {
     return res.status(500).json({ msg: "Server error", error });
+  }
+};
+
+export const getActiveTrips = async (req, res, next) => {
+  try {
+    const activeTrip = await ActiveTrip.find({}, {});
+    const activeTripData = await Promise.all(
+      activeTrip.map(async (trip) => {
+        return {
+          ...trip._doc,
+        };
+      })
+    );
+
+    return res.status(200).json(activeTripData);
+  } catch (error) {
+    next(error);
   }
 };

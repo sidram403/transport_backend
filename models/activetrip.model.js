@@ -5,7 +5,7 @@ const activeTrips = new mongoose.Schema({
     type: String, // Alternatively, you can use Date type if you store it as a full Date object
     required: true,
   },
-  TripId: {
+  tripId: {
     type: String,
     required: true,
   },
